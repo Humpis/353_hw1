@@ -12,7 +12,7 @@ if(len(sys.argv) > 2):
     if sys.argv[2] == "--punct":
         print("Checking for punctuation-included words file...")
         if os.path.isfile(os.getcwd() + '/punctWords.txt'):
-            print("Punctiation-included words file already exists")
+            print("Punctiation-included words file already exists. Loading...")
             with open(os.getcwd() + '/punctWords.txt', 'r') as f:
                 try:
                     words = json.load(f)
@@ -39,7 +39,7 @@ if(len(sys.argv) > 2):
     elif sys.argv[2] == "--nopunct":
         print("Checking for punctuation-excluded words file...")
         if os.path.isfile(os.getcwd() + '/nopunctWords.txt'):
-            print("Punctiation-excluded words file already exists")
+            print("Punctiation-excluded words file already exists. Loading...")
             with open(os.getcwd() + '/nopunctWords.txt', 'r') as f:
                 try:
                     words = json.load(f)
