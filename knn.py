@@ -9,7 +9,9 @@ path_pos = os.getcwd() + '/review_polarity/txt_sentoken/pos/'
 trainingStop = 500
 counter = 0
 words = {}
-y = [0, 1]
+y = np.zeros((2000, 1), dtype=np.int)
+for i in range(1000, 2000):
+    y[i] = 1
 x = []
 k = -1
 metric = -1
@@ -148,3 +150,26 @@ elif sys.argv[4] == '--metric=manhattan':
 else:
     print("Invalid argument")
     sys.exit(0)
+
+x1 = np.zeros((400, len(words)), dtype=np.int)
+x2 = np.zeros((400, len(words)), dtype=np.int)
+x3 = np.zeros((400, len(words)), dtype=np.int)
+x4 = np.zeros((400, len(words)), dtype=np.int)
+x5 = np.zeros((400, len(words)), dtype=np.int)
+y1 = np.zeros((4000, 1), dtype=np.int)
+y2 = np.zeros((4000, 1), dtype=np.int)
+y3 = np.zeros((4000, 1), dtype=np.int)
+y4 = np.zeros((4000, 1), dtype=np.int)
+y5 = np.zeros((4000, 1), dtype=np.int)
+xo = x.copy()
+yo = y.copy()
+print(x)
+for i in range(1, 1000):
+    if i % 2 == 0:
+        continue
+    xo[i] = x[i + 999]
+    yo[i] = y[i + 999]
+    xo[i + 999] = x[i]
+    yo[i + 999] = y[i]
+print(xo)
+
