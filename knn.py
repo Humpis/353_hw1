@@ -3,12 +3,18 @@ import sys
 import json
 import string
 import re
+import numpy as np
 path_neg = os.getcwd() + '/review_polarity/txt_sentoken/neg/'
 path_pos = os.getcwd() + '/review_polarity/txt_sentoken/pos/'
 trainingStop = 500
+counter = 0
 words = {}
+y = [0, 1]
+x = []
+k = -1
+metric = -1
 
-if(len(sys.argv) > 2):
+if(len(sys.argv) == 5):
     if sys.argv[2] == "--punct":
         print("Checking for punctuation-included words file...")
         if os.path.isfile(os.getcwd() + '/punctWords.txt'):
@@ -27,12 +33,16 @@ if(len(sys.argv) > 2):
                 with open(path_neg + filename, 'r') as f:
                     for line in f:
                         for word in line.split():
-                            words[word] = 0
+                            if word not in words:
+                                words[word] = counter
+                                counter += 1
             for filename in os.listdir(path_pos):
                 with open(path_pos + filename, 'r') as f:
                     for line in f:
                         for word in line.split():
-                            words[word] = 0
+                            if word not in words:
+                                words[word] = counter
+                                counter += 1
             words_file = open('punctWords.txt', 'w')
             json.dump(words, words_file)
             print("Generation sucsessful")
@@ -57,7 +67,9 @@ if(len(sys.argv) > 2):
                             newWord = re.sub(
                                 '[' + string.punctuation + ']', '', word)
                             if newWord != '':
-                                words[newWord] = 0
+                                if word not in words:
+                                    words[word] = counter
+                                    counter += 1
             for filename in os.listdir(path_pos):
                 with open(path_pos + filename, 'r') as f:
                     for line in f:
@@ -65,7 +77,9 @@ if(len(sys.argv) > 2):
                             newWord = re.sub(
                                 '[' + string.punctuation + ']', '', word)
                             if newWord != '':
-                                words[newWord] = 0
+                                if word not in words:
+                                    words[word] = counter
+                                    counter += 1
             words_file = open('nopunctWords.txt', 'w')
             json.dump(words, words_file)
             print("Generation sucsessful")
@@ -77,8 +91,60 @@ else:
     sys.exit(0)
 # Now make the matrix for binary or frequency
 if sys.argv[1] == "--binary":
-    print("bin")
+    print('Creating matrix X for binary representation...')
+    x = np.zeros((2000, len(words)), dtype=np.int)
+    row = 0
+    for filename in os.listdir(path_neg):
+        with open(path_neg + filename, 'r') as f:
+            for line in f:
+                for word in line.split():
+                    if words.get(word) is not None:
+                        x[row][words.get(word)] = 1
+        row += 1
+    for filename in os.listdir(path_pos):
+        with open(path_pos + filename, 'r') as f:
+            for line in f:
+                for word in line.split():
+                    if words.get(word) is not None:
+                        x[row][words.get(word)] = 1
+        row += 1
+    print(x)
 elif sys.argv[1] == "--frequency":
-    print("freq")
+    print('Creating matrix X for frequency representation...')
+    x = np.zeros((2000, len(words)), dtype=np.int)
+    row = 0
+    for filename in os.listdir(path_neg):
+        with open(path_neg + filename, 'r') as f:
+            for line in f:
+                for word in line.split():
+                    if words.get(word) is not None:
+                        x[row][words.get(word)] = x[row][words.get(word)] + 1
+        row += 1
+    for filename in os.listdir(path_pos):
+        with open(path_pos + filename, 'r') as f:
+            for line in f:
+                for word in line.split():
+                    if words.get(word) is not None:
+                        x[row][words.get(word)] = x[row][words.get(word)] + 1
+        row += 1
 else:
     print("Invalid argument")
+    sys.exit(0)
+
+if sys.argv[3][:4] == '--k=':
+    try:
+        k = int(sys.argv[3][4:])
+    except ValueError:
+        print("Error: K must be an integer")
+        sys.exit(0)
+else:
+    print("Invalid argument")
+    sys.exit(0)
+
+if sys.argv[4] == '--metric=euclidean':
+    metric = 0
+elif sys.argv[4] == '--metric=manhattan':
+    metric = 1
+else:
+    print("Invalid argument")
+    sys.exit(0)
