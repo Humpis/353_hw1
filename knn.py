@@ -4,12 +4,14 @@ import json
 import string
 import re
 import numpy as np
+from numpy import linalg as la
+import math
 path_neg = os.getcwd() + '/review_polarity/txt_sentoken/neg/'
 path_pos = os.getcwd() + '/review_polarity/txt_sentoken/pos/'
 trainingStop = 500
 counter = 0
 words = {}
-y = np.zeros((2000, 1), dtype=np.int)
+y = np.zeros((2000), dtype=np.int)
 for i in range(1000, 2000):
     y[i] = 1
 x = []
@@ -151,16 +153,16 @@ else:
     print("Invalid argument")
     sys.exit(0)
 
-x1 = np.zeros((400, len(words)), dtype=np.int)
-x2 = np.zeros((400, len(words)), dtype=np.int)
-x3 = np.zeros((400, len(words)), dtype=np.int)
-x4 = np.zeros((400, len(words)), dtype=np.int)
-x5 = np.zeros((400, len(words)), dtype=np.int)
-y1 = np.zeros((400, 1), dtype=np.int)
-y2 = np.zeros((400, 1), dtype=np.int)
-y3 = np.zeros((400, 1), dtype=np.int)
-y4 = np.zeros((400, 1), dtype=np.int)
-y5 = np.zeros((400, 1), dtype=np.int)
+# x1 = np.zeros((400, len(words)), dtype=np.int)
+# x2 = np.zeros((400, len(words)), dtype=np.int)
+# x3 = np.zeros((400, len(words)), dtype=np.int)
+# x4 = np.zeros((400, len(words)), dtype=np.int)
+# x5 = np.zeros((400, len(words)), dtype=np.int)
+# y1 = np.zeros((400, 1), dtype=np.int)
+# y2 = np.zeros((400, 1), dtype=np.int)
+# y3 = np.zeros((400, 1), dtype=np.int)
+# y4 = np.zeros((400, 1), dtype=np.int)
+# y5 = np.zeros((400, 1), dtype=np.int)
 xo = x.copy()
 yo = y.copy()
 # print(x)
@@ -173,18 +175,84 @@ for i in range(1, 1000):
     yo[i + 999] = y[i]
 # print(yo[390:400])
 
-for i in range(0, 400):
-    x1[i] = xo[i]
-    x2[i] = xo[i + 400]
-    x3[i] = xo[i + 800]
-    x4[i] = xo[i + 1200]
-    x5[i] = xo[i + 1600]
-    y1[i] = yo[i]
-    y2[i] = yo[i + 400]
-    y3[i] = yo[i + 800]
-    y4[i] = yo[i + 1200]
-    y5[i] = yo[i + 1600]
+# for i in range(0, 400):
+#     x1[i] = xo[i]
+#     x2[i] = xo[i + 400]
+#     x3[i] = xo[i + 800]
+#     x4[i] = xo[i + 1200]
+#     x5[i] = xo[i + 1600]
+#     y1[i] = yo[i]
+#     y2[i] = yo[i + 400]
+#     y3[i] = yo[i + 800]
+#     y4[i] = yo[i + 1200]
+#     y5[i] = yo[i + 1600]
 # print(x1)
 # print(y2)
 # print(len(x1))
 # print(x2)
+
+# for i in range(0, 400):
+#     d = np.zeros((1600, 1))
+#     for j in range(0, 400):
+#         sumofs = 0
+#         for q in range(0, len(words)):
+#             sumofs = math.pow(x1[i][q] - x2[j][q], 2)   # change
+#         d[j] = math.sqrt(sumofs)
+#     for j in range(0, 400):
+#         sumofs = 0
+#         for q in range(0, len(words)):
+#             sumofs = math.pow(x1[i][q] - x3[j][q], 2)   # change
+#         d[j + 400] = math.sqrt(sumofs)
+#     for j in range(0, 400):
+#         sumofs = 0
+#         for q in range(0, len(words)):
+#             sumofs = math.pow(x1[i][q] - x4[j][q], 2)   # change
+#         d[j + 800] = math.sqrt(sumofs)
+#     for j in range(0, 400):
+#         sumofs = 0
+#         for q in range(0, len(words)):
+#             sumofs = math.pow(x1[i][q] - x5[j][q], 2)   # change
+#         d[j + 1200] = math.sqrt(sumofs)
+#     sortedd = np.argsort(d)
+#     for j in range(0, k):
+#         print(k)
+
+print('about the do this shit...')
+for a in range(0, 5):
+    # print(a)
+    for i in range(a * 400, a * 400 + 400):
+        # print(i)
+        d = np.zeros((2000), dtype=np.float)
+        # print(d)
+        for j in range(0, 2000):
+            if (j >= a * 400) and (j < a * 400 + 400):
+                continue
+
+            # sumofs = 0
+            # for q in range(0, len(words)):
+            #     sumofs += math.pow(xo[i][q] - xo[j][q], 2)
+            # d[j] = math.sqrt(sumofs)
+            # print(xo[i])
+            xi = np.array(xo[i])
+            # print(xi)
+            xj = np.array(xo[j])
+            d[j] = la.norm(xi - xj)
+            # print(d[j])
+
+            # print(d[j])
+        # print(d)
+        # print(np.argsort(d))
+        sortedd = np.argsort(d)
+        # print(d)
+        positive = 0
+        for j in range(0, k):
+            # print(sortedd[j + 400])
+            # print(sortedd)
+            # print(d[sortedd])
+            # print(sortedd[395: 405])
+            # print(len(sortedd))
+            positive += yo[sortedd[j + 400]]
+            # print(yo[sortedd[j + 400]])
+        positive /= k
+        print(positive)
+        print(yo[i])
