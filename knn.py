@@ -110,7 +110,7 @@ if sys.argv[1] == "--binary":
                     if words.get(word) is not None:
                         x[row][words.get(word)] = 1
         row += 1
-    print(x)
+    # print(x)
 elif sys.argv[1] == "--frequency":
     print('Creating matrix X for frequency representation...')
     x = np.zeros((2000, len(words)), dtype=np.int)
@@ -156,14 +156,14 @@ x2 = np.zeros((400, len(words)), dtype=np.int)
 x3 = np.zeros((400, len(words)), dtype=np.int)
 x4 = np.zeros((400, len(words)), dtype=np.int)
 x5 = np.zeros((400, len(words)), dtype=np.int)
-y1 = np.zeros((4000, 1), dtype=np.int)
-y2 = np.zeros((4000, 1), dtype=np.int)
-y3 = np.zeros((4000, 1), dtype=np.int)
-y4 = np.zeros((4000, 1), dtype=np.int)
-y5 = np.zeros((4000, 1), dtype=np.int)
+y1 = np.zeros((400, 1), dtype=np.int)
+y2 = np.zeros((400, 1), dtype=np.int)
+y3 = np.zeros((400, 1), dtype=np.int)
+y4 = np.zeros((400, 1), dtype=np.int)
+y5 = np.zeros((400, 1), dtype=np.int)
 xo = x.copy()
 yo = y.copy()
-print(x)
+# print(x)
 for i in range(1, 1000):
     if i % 2 == 0:
         continue
@@ -171,5 +171,20 @@ for i in range(1, 1000):
     yo[i] = y[i + 999]
     xo[i + 999] = x[i]
     yo[i + 999] = y[i]
-print(xo)
+# print(yo[390:400])
 
+for i in range(0, 400):
+    x1[i] = xo[i]
+    x2[i] = xo[i + 400]
+    x3[i] = xo[i + 800]
+    x4[i] = xo[i + 1200]
+    x5[i] = xo[i + 1600]
+    y1[i] = yo[i]
+    y2[i] = yo[i + 400]
+    y3[i] = yo[i + 800]
+    y4[i] = yo[i + 1200]
+    y5[i] = yo[i + 1600]
+# print(x1)
+# print(y2)
+# print(len(x1))
+# print(x2)
