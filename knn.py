@@ -219,6 +219,10 @@ for i in range(1, 1000):
 
 print('about the do this shit...')
 for a in range(0, 5):
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
     # print(a)
     for i in range(a * 400, a * 400 + 400):
         # print(i)
@@ -254,5 +258,28 @@ for a in range(0, 5):
             positive += yo[sortedd[j + 400]]
             # print(yo[sortedd[j + 400]])
         positive /= k
-        print(positive)
-        print(yo[i])
+        # print(positive)
+        # print(yo[i])
+        if positive >= .5:
+            if yo[i] == 1:
+                tp += 1
+            else:
+                fp += 1
+        else:
+            if yo[i] == 1:
+                fn += 1
+            else:
+                tn += 1
+    PrecisionP = tp / (tp + fp)
+    PrecisionN = tn / (tn + fn)
+    RecallP = tp / (tp + fn)
+    RecallN = tn / (tn + fp)
+    Accuracy = (tp + tn) / (tp + tn + fp + fn)
+    print("Precision+ ", PrecisionP)
+    print("Precision- ", PrecisionN)
+    print("Recall+ ", RecallP)
+    print("Recall- ", RecallN)
+    print("Accuracy ", Accuracy)
+    print("Precision ", (PrecisionP + PrecisionN) / 2)
+    print("Recall ", (RecallP + RecallN) / 2)
+sys.exit(0)
