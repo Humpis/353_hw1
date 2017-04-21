@@ -2,7 +2,7 @@ NAME
     knn - Compute 5-fold cross validation and get statistics for K-nearest neighbor algorithm.
 
 SYNOPSIS
-    python knn.py [--binary|--frequency] [--punct|--nopunct] [--k=NUM] [--metric=euclidean|manhattan]
+    python knn.py [--binary|--frequency] [--punct|--nopunct] [--k=NUM] [--metric=euclidean|manhattan] [--stopwords|--nostopwords]
 
 DESCRIPTION
     Compute 5-fold cross validation and get statistics for K-nearest neighbor algorithm.
@@ -15,6 +15,8 @@ DESCRIPTION
         --k=NUM NUM is the number of nearest neighbors to check
         --metric=euclidean use euclidean distance to compute nearest neighbors
         --metric=manhattan use manhattan distance to compute nearest niehgbors
+        --stopwords count stops words as features
+        --nostopwords ignore stop words as features
     
     Exit Status:
     Returns 0 on sucess, 1 on error.

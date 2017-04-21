@@ -5,10 +5,54 @@ import string
 import re
 import numpy as np
 from numpy import linalg as la
-import math
 path_neg = os.getcwd() + '/review_polarity/txt_sentoken/neg/'
 path_pos = os.getcwd() + '/review_polarity/txt_sentoken/pos/'
-trainingStop = 500
+stopwords = ["a", "about", "above", "above", "across", "after",
+             "afterwards", "again", "against", "all", "almost", "alone",
+             "along", "already", "also", "although", "always", "am", "among",
+             "amoungst", "amount", "an", "and", "another", "any", "anyhow",
+             "anyone", "anything", "anyway", "anywhere", "are", "around", "as",
+             "at", "back", "be", "became", "because", "become", "becomes",
+             "becoming", "been", "before", "beforehand", "behind", "being",
+             "below", "beside", "besides", "between", "beyond", "bill", "both",
+             "bottom", "but", "by", "call", "can", "cannot", "cant", "co",
+             "con", "could", "couldnt", "cry", "de", "describe", "detail",
+             "done", "down", "due", "during", "each", "eg", "eight", "either",
+             "eleven", "else", "elsewhere", "empty", "enough", "etc", "even",
+             "ever", "every", "everyone", "everything", "everywhere", "except",
+             "few", "fifteen", "fify", "fill", "find", "fire", "first", "five",
+             "for", "former", "formerly", "forty", "found", "four", "from",
+             "front", "full", "further", "get", "give", "go", "had", "has",
+             "hasnt", "have", "he", "hence", "her", "here", "hereafter",
+             "hereby", "herein", "hereupon", "hers", "herself", "him",
+             "himself", "his", "how", "however", "hundred", "ie", "if", "in",
+             "inc", "indeed", "interest", "into", "is", "it", "its", "itself",
+             "keep", "last", "latter", "latterly", "least", "less", "ltd",
+             "many", "may", "me", "meanwhile", "might", "mill", "mine", "more",
+             "moreover", "most", "mostly", "move", "much", "must", "my",
+             "name", "namely", "neither", "never", "nevertheless", "next",
+             "no", "nobody", "none", "noone", "nor", "not", "nothing", "now",
+             "nowhere", "of", "off", "often", "on", "once", "one", "only",
+             "or", "other", "others", "otherwise", "our", "ours", "ourselves",
+             "out", "over", "own", "part", "per", "perhaps", "please", "put",
+             "rather", "re", "same", "see", "seem", "seemed", "seeming",
+             "serious", "several", "she", "should", "show", "side", "since",
+             "sincere", "six", "sixty", "so", "some", "somehow", "someone",
+             "something", "sometime", "sometimes", "somewhere", "still",
+             "system", "take", "ten", "than", "that", "the", "their", "them",
+             "themselves", "then", "thence", "there", "thereafter", "thereby",
+             "therefore", "therein", "thereupon", "these", "they", "thickv",
+             "thin", "third", "this", "those", "though", "three", "through",
+             "throughout", "thru", "thus", "to", "together", "too", "top",
+             "toward", "towards", "twelve", "twenty", "two", "un", "under",
+             "until", "up", "upon", "us", "very", "via", "was", "we", "well",
+             "were", "what", "whatever", "when", "whence", "whenever", "where",
+             "whereafter", "whereas", "whereby", "wherein", "whereupon",
+             "wherever", "whether", "which", "while", "whither", "who",
+             "whole", "whom", "whose", "why", "will", "with", "within",
+             "would", "yet", "you", "your", "yours", "yourself", "yourselves",
+             "the", "amongst", "do", "made", "myself", "nine", "onto", "seems",
+             "such", "whoever", "without"]
 counter = 0
 words = {}
 y = np.zeros((2000), dtype=np.int)
@@ -18,7 +62,7 @@ x = []
 k = -1
 metric = -1
 
-if(len(sys.argv) == 5):
+if(len(sys.argv) == 6):
     if sys.argv[2] == "--punct":
         print("Checking for punctuation-included words file...")
         if os.path.isfile(os.getcwd() + '/punctWords.txt'):
@@ -93,6 +137,14 @@ if(len(sys.argv) == 5):
 else:
     print("Invalid arguments")
     sys.exit(1)
+# Stop words
+if(sys.argv[5] == '--stopwords'):
+    pythonisstupid = 1
+elif(sys.argv[5] == '--nostopwords'):
+    print("g")
+else:
+    print("Invalid argument")
+    sys.exit(1)
 # Now make the matrix for binary or frequency
 if sys.argv[1] == "--binary":
     print('Creating matrix X for binary representation...')
@@ -153,19 +205,9 @@ else:
     print("Invalid argument")
     sys.exit(1)
 
-# x1 = np.zeros((400, len(words)), dtype=np.int)
-# x2 = np.zeros((400, len(words)), dtype=np.int)
-# x3 = np.zeros((400, len(words)), dtype=np.int)
-# x4 = np.zeros((400, len(words)), dtype=np.int)
-# x5 = np.zeros((400, len(words)), dtype=np.int)
-# y1 = np.zeros((400, 1), dtype=np.int)
-# y2 = np.zeros((400, 1), dtype=np.int)
-# y3 = np.zeros((400, 1), dtype=np.int)
-# y4 = np.zeros((400, 1), dtype=np.int)
-# y5 = np.zeros((400, 1), dtype=np.int)
 xo = x.copy()
 yo = y.copy()
-# print(x)
+
 for i in range(1, 1000):
     if i % 2 == 0:
         continue
@@ -173,49 +215,6 @@ for i in range(1, 1000):
     yo[i] = y[i + 999]
     xo[i + 999] = x[i]
     yo[i + 999] = y[i]
-# print(yo[390:400])
-
-# for i in range(0, 400):
-#     x1[i] = xo[i]
-#     x2[i] = xo[i + 400]
-#     x3[i] = xo[i + 800]
-#     x4[i] = xo[i + 1200]
-#     x5[i] = xo[i + 1600]
-#     y1[i] = yo[i]
-#     y2[i] = yo[i + 400]
-#     y3[i] = yo[i + 800]
-#     y4[i] = yo[i + 1200]
-#     y5[i] = yo[i + 1600]
-# print(x1)
-# print(y2)
-# print(len(x1))
-# print(x2)
-
-# for i in range(0, 400):
-#     d = np.zeros((1600, 1))
-#     for j in range(0, 400):
-#         sumofs = 0
-#         for q in range(0, len(words)):
-#             sumofs = math.pow(x1[i][q] - x2[j][q], 2)   # change
-#         d[j] = math.sqrt(sumofs)
-#     for j in range(0, 400):
-#         sumofs = 0
-#         for q in range(0, len(words)):
-#             sumofs = math.pow(x1[i][q] - x3[j][q], 2)   # change
-#         d[j + 400] = math.sqrt(sumofs)
-#     for j in range(0, 400):
-#         sumofs = 0
-#         for q in range(0, len(words)):
-#             sumofs = math.pow(x1[i][q] - x4[j][q], 2)   # change
-#         d[j + 800] = math.sqrt(sumofs)
-#     for j in range(0, 400):
-#         sumofs = 0
-#         for q in range(0, len(words)):
-#             sumofs = math.pow(x1[i][q] - x5[j][q], 2)   # change
-#         d[j + 1200] = math.sqrt(sumofs)
-#     sortedd = np.argsort(d)
-#     for j in range(0, k):
-#         print(k)
 
 print('about the do this shit...')
 for a in range(0, 5):
@@ -223,11 +222,8 @@ for a in range(0, 5):
     fp = 0
     tn = 0
     fn = 0
-    # print(a)
     for i in range(a * 400, a * 400 + 400):
-        # print(i)
         d = np.zeros((2000), dtype=np.float)
-        # print(d)
         for j in range(0, 2000):
             if (j >= a * 400) and (j < a * 400 + 400):
                 continue
@@ -236,30 +232,15 @@ for a in range(0, 5):
             # for q in range(0, len(words)):
             #     sumofs += math.pow(xo[i][q] - xo[j][q], 2)
             # d[j] = math.sqrt(sumofs)
-            # print(xo[i])
+
             xi = np.array(xo[i])
-            # print(xi)
             xj = np.array(xo[j])
             d[j] = la.norm(xi - xj)
-            # print(d[j])
-
-            # print(d[j])
-        # print(d)
-        # print(np.argsort(d))
         sortedd = np.argsort(d)
-        # print(d)
         positive = 0
         for j in range(0, k):
-            # print(sortedd[j + 400])
-            # print(sortedd)
-            # print(d[sortedd])
-            # print(sortedd[395: 405])
-            # print(len(sortedd))
             positive += yo[sortedd[j + 400]]
-            # print(yo[sortedd[j + 400]])
         positive /= k
-        # print(positive)
-        # print(yo[i])
         if positive >= .5:
             if yo[i] == 1:
                 tp += 1
@@ -283,4 +264,3 @@ for a in range(0, 5):
     print("Precision ", (PrecisionP + PrecisionN) / 2)
     print("Recall ", (RecallP + RecallN) / 2)
 sys.exit(0)
-# number of things, and can I use numpy
