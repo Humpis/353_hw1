@@ -30,7 +30,7 @@ if(len(sys.argv) == 5):
                 except ValueError:
                     words = {}
                     print("File is empty error")
-                    sys.exit(0)
+                    sys.exit(1)
         else:
             print("Punctiation-included words file not found. Generating...")
             for filename in os.listdir(path_neg):
@@ -61,7 +61,7 @@ if(len(sys.argv) == 5):
                 except ValueError:
                     words = {}
                     print("File is empty error")
-                    sys.exit(0)
+                    sys.exit(1)
         else:
             print("Punctiation-excluded words file not found. Generating...")
             for filename in os.listdir(path_neg):
@@ -89,10 +89,10 @@ if(len(sys.argv) == 5):
             print("Generation sucsessful")
     else:
         print("Invalid argument")
-        sys.exit(0)
+        sys.exit(1)
 else:
     print("Invalid arguments")
-    sys.exit(0)
+    sys.exit(1)
 # Now make the matrix for binary or frequency
 if sys.argv[1] == "--binary":
     print('Creating matrix X for binary representation...')
@@ -133,17 +133,17 @@ elif sys.argv[1] == "--frequency":
         row += 1
 else:
     print("Invalid argument")
-    sys.exit(0)
+    sys.exit(1)
 
 if sys.argv[3][:4] == '--k=':
     try:
         k = int(sys.argv[3][4:])
     except ValueError:
         print("Error: K must be an integer")
-        sys.exit(0)
+        sys.exit(1)
 else:
     print("Invalid argument")
-    sys.exit(0)
+    sys.exit(1)
 
 if sys.argv[4] == '--metric=euclidean':
     metric = 0
@@ -151,7 +151,7 @@ elif sys.argv[4] == '--metric=manhattan':
     metric = 1
 else:
     print("Invalid argument")
-    sys.exit(0)
+    sys.exit(1)
 
 # x1 = np.zeros((400, len(words)), dtype=np.int)
 # x2 = np.zeros((400, len(words)), dtype=np.int)
@@ -283,3 +283,4 @@ for a in range(0, 5):
     print("Precision ", (PrecisionP + PrecisionN) / 2)
     print("Recall ", (RecallP + RecallN) / 2)
 sys.exit(0)
+# number of things, and can I use numpy
