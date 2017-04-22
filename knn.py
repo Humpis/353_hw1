@@ -301,10 +301,16 @@ for a in range(0, 5):
 
     if a == 0:
         d = scipy.spatial.distance.cdist(x1, xo, metric)
-        d = np.delete(d, [0, 400], axis=1)
-        yy = np.delete(yo, [0, 400], axis=0)
+        print(d)
+        print(len(d[0]))
+        d = np.delete(d, np.s_[0:400], axis=1)
+        yy = np.delete(yo, np.s_[0:400], axis=0)
+        # print(d)
+        # print(len(d[0]))
         for i in range(0, 400):
             sortedd = np.argsort(d[i])
+            # print(sortedd)
+            # print(d[i][sortedd])
             positive = 0
             for j in range(0, k):
                 positive += yy[sortedd[j]]
@@ -321,8 +327,8 @@ for a in range(0, 5):
                     tn += 1
     if a == 1:
         d = scipy.spatial.distance.cdist(x2, xo, metric)
-        d = np.delete(d, [400, 800], axis=1)
-        yy = np.delete(yo, [400, 800], axis=0)
+        d = np.delete(d, np.s_[400:800], axis=1)
+        yy = np.delete(yo, np.s_[400:800], axis=0)
         for i in range(0, 400):
             sortedd = np.argsort(d[i])
             positive = 0
@@ -341,8 +347,8 @@ for a in range(0, 5):
                     tn += 1
     if a == 2:
         d = scipy.spatial.distance.cdist(x3, xo, metric)
-        d = np.delete(d, [800, 1200], axis=1)
-        yy = np.delete(yo, [800, 1200], axis=0)
+        d = np.delete(d, np.s_[800:1200], axis=1)
+        yy = np.delete(yo, np.s_[800:1200], axis=0)
         for i in range(0, 400):
             sortedd = np.argsort(d[i])
             positive = 0
@@ -361,8 +367,8 @@ for a in range(0, 5):
                     tn += 1
     if a == 3:
         d = scipy.spatial.distance.cdist(x4, xo, metric)
-        d = np.delete(d, [1200, 1600], axis=1)
-        yy = np.delete(yo, [1200, 1600], axis=0)
+        d = np.delete(d, np.s_[1200:1600], axis=1)
+        yy = np.delete(yo, np.s_[1200:1600], axis=0)
         for i in range(0, 400):
             sortedd = np.argsort(d[i])
             positive = 0
@@ -381,8 +387,8 @@ for a in range(0, 5):
                     tn += 1
     if a == 4:
         d = scipy.spatial.distance.cdist(x5, xo, metric)
-        d = np.delete(d, [1600, 2000], axis=1)
-        yy = np.delete(yo, [1600, 2000], axis=0)
+        d = np.delete(d, np.s_[1600:2000], axis=1)
+        yy = np.delete(yo, np.s_[1600:2000], axis=0)
         for i in range(0, 400):
             sortedd = np.argsort(d[i])
             positive = 0
