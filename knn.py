@@ -209,7 +209,7 @@ else:
 if sys.argv[4] == '--metric=euclidean':
     metric = 'euclidean'
 elif sys.argv[4] == '--metric=manhattan':
-    metric = 'manhattan'
+    metric = 'cityblock'
 else:
     print("Invalid argument")
     sys.exit(1)
