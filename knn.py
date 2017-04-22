@@ -153,10 +153,10 @@ else:
     sys.exit(1)
 
 # Now make the matrix for binary or frequency
-print(len(words))
+# print(len(words))
 if sys.argv[1] == "--binary":
     print('Creating matrix X for binary representation...')
-    x = np.zeros((2000, len(words)), dtype=np.int)
+    x = np.zeros((2000, len(words)), dtype=np.float)
     row = 0
     for filename in os.listdir(path_neg):
         with open(path_neg + filename, 'r') as f:
@@ -175,7 +175,7 @@ if sys.argv[1] == "--binary":
     # print(x)
 elif sys.argv[1] == "--frequency":
     print('Creating matrix X for frequency representation...')
-    x = np.zeros((2000, len(words)), dtype=np.int)
+    x = np.zeros((2000, len(words)), dtype=np.float)
     row = 0
     for filename in os.listdir(path_neg):
         with open(path_neg + filename, 'r') as f:
@@ -225,6 +225,21 @@ for i in range(1, 1000):
     yo[i + 999] = y[i]
 
 print('about the do this shit...')
+
+# for i in range(0, 5):
+#     print("ALLAH")
+#     xi = np.array(xo[i])
+#     xinorm = la.norm(xi)
+#     print(xinorm)
+#     print(x[i])
+#     xi = xi / xinorm
+#     xo[i] = xi
+#     print(x[i])
+#     print(xi)
+#     normofX = la.norm(xo[i])
+#     print(normofX)
+#     normofX = la.norm(xi)
+#     print(normofX)
 for a in range(0, 5):
     tp = 0
     fp = 0
@@ -232,6 +247,9 @@ for a in range(0, 5):
     fn = 0
     for i in range(a * 400, a * 400 + 400):
         d = np.zeros((2000), dtype=np.float)
+        xi = np.array(xo[i])
+        xinorm = la.norm(xi)
+        xi = xi / xinorm
         for j in range(0, 2000):
             if (j >= a * 400) and (j < a * 400 + 400):
                 continue
@@ -241,8 +259,10 @@ for a in range(0, 5):
             #     sumofs += math.pow(xo[i][q] - xo[j][q], 2)
             # d[j] = math.sqrt(sumofs)
 
-            xi = np.array(xo[i])
             xj = np.array(xo[j])
+            xjnorm = la.norm(xj)
+            xj = xj / xjnorm
+
             d[j] = la.norm(xi - xj)
         sortedd = np.argsort(d)
         positive = 0
@@ -264,11 +284,13 @@ for a in range(0, 5):
     RecallP = tp / (tp + fn)
     RecallN = tn / (tn + fp)
     Accuracy = (tp + tn) / (tp + tn + fp + fn)
-    print("Precision+ ", PrecisionP)
-    print("Precision- ", PrecisionN)
-    print("Recall+ ", RecallP)
-    print("Recall- ", RecallN)
-    print("Accuracy ", Accuracy)
-    print("Precision ", (PrecisionP + PrecisionN) / 2)
-    print("Recall ", (RecallP + RecallN) / 2)
+    print("Fold: ", a + 1)
+    print("    Precision+ ", PrecisionP)
+    print("    Precision- ", PrecisionN)
+    print("    Recall+    ", RecallP)
+    print("    Recall-    ", RecallN)
+    print("    Accuracy   ", Accuracy)
+    print("    Precision  ", (PrecisionP + PrecisionN) / 2)
+    print("    Recall     ", (RecallP + RecallN) / 2)
+    print(tp, fp, tn, fn)
 sys.exit(0)
