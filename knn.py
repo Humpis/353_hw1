@@ -64,50 +64,70 @@ metric = -1
 
 if(len(sys.argv) == 6):
     if sys.argv[2] == "--punct":
-        print("Checking for punctuation-included words file...")
-        if os.path.isfile(os.getcwd() + '/punctWords.txt'):
-            print("Punctiation-included words file already exists. Loading...")
-            with open(os.getcwd() + '/punctWords.txt', 'r') as f:
-                try:
-                    words = json.load(f)
-                    # if the file is empty the ValueError will be thrown
-                except ValueError:
-                    words = {}
-                    print("File is empty error")
-                    sys.exit(1)
-        else:
-            print("Punctiation-included words file not found. Generating...")
+        # print("Checking for punctuation-included words file...")
+        # if os.path.isfile(os.getcwd() + '/punctWords.txt'):
+        #     print("Punctiation-included words file already exists. Loading...")
+        #     with open(os.getcwd() + '/punctWords.txt', 'r') as f:
+        #         try:
+        #             words = json.load(f)
+        #             # if the file is empty the ValueError will be thrown
+        #         except ValueError:
+        #             words = {}
+        #             print("File is empty error")
+        #             sys.exit(1)
+        # else:
+        #    print("Punctiation-included words file not found. Generating...")
+            print("Generating list of words...")
             for filename in os.listdir(path_neg):
                 with open(path_neg + filename, 'r') as f:
                     for line in f:
                         for word in line.split():
                             if word not in words:
-                                words[word] = counter
-                                counter += 1
+                                # Stop words
+                                if(sys.argv[5] == '--stopwords'):
+                                    words[word] = counter
+                                    counter += 1
+                                elif(sys.argv[5] == '--nostopwords'):
+                                    if word not in stopwords:
+                                        words[word] = counter
+                                        counter += 1
+                                else:
+                                    print("Invalid argument")
+                                    sys.exit(1)
             for filename in os.listdir(path_pos):
                 with open(path_pos + filename, 'r') as f:
                     for line in f:
                         for word in line.split():
                             if word not in words:
-                                words[word] = counter
-                                counter += 1
-            words_file = open('punctWords.txt', 'w')
-            json.dump(words, words_file)
-            print("Generation sucsessful")
+                                # Stop words
+                                if(sys.argv[5] == '--stopwords'):
+                                    words[word] = counter
+                                    counter += 1
+                                elif(sys.argv[5] == '--nostopwords'):
+                                    if word not in stopwords:
+                                        words[word] = counter
+                                        counter += 1
+                                else:
+                                    print("Invalid argument")
+                                    sys.exit(1)
+            # words_file = open('punctNoStopWords.txt', 'w')
+            # json.dump(words, words_file)
+            # print("Generation sucsessful")
     elif sys.argv[2] == "--nopunct":
-        print("Checking for punctuation-excluded words file...")
-        if os.path.isfile(os.getcwd() + '/nopunctWords.txt'):
-            print("Punctiation-excluded words file already exists. Loading...")
-            with open(os.getcwd() + '/nopunctWords.txt', 'r') as f:
-                try:
-                    words = json.load(f)
-                    # if the file is empty the ValueError will be thrown
-                except ValueError:
-                    words = {}
-                    print("File is empty error")
-                    sys.exit(1)
-        else:
-            print("Punctiation-excluded words file not found. Generating...")
+        # print("Checking for punctuation-excluded words file...")
+        # if os.path.isfile(os.getcwd() + '/nopunctWords.txt'):
+        #     print("Punctiation-excluded words file already exists. Loading...")
+        #     with open(os.getcwd() + '/nopunctWords.txt', 'r') as f:
+        #         try:
+        #             words = json.load(f)
+        #             # if the file is empty the ValueError will be thrown
+        #         except ValueError:
+        #             words = {}
+        #             print("File is empty error")
+        #             sys.exit(1)
+        # else:
+        #     print("Punctiation-excluded words file not found. Generating...")
+            print("Generating list of words...")
             for filename in os.listdir(path_neg):
                 with open(path_neg + filename, 'r') as f:
                     for line in f:
@@ -116,8 +136,17 @@ if(len(sys.argv) == 6):
                                 '[' + string.punctuation + ']', '', word)
                             if newWord != '':
                                 if word not in words:
-                                    words[word] = counter
-                                    counter += 1
+                                    # Stop words
+                                    if(sys.argv[5] == '--stopwords'):
+                                        words[word] = counter
+                                        counter += 1
+                                    elif(sys.argv[5] == '--nostopwords'):
+                                        if word not in stopwords:
+                                            words[word] = counter
+                                            counter += 1
+                                    else:
+                                        print("Invalid argument")
+                                        sys.exit(1)
             for filename in os.listdir(path_pos):
                 with open(path_pos + filename, 'r') as f:
                     for line in f:
@@ -126,26 +155,29 @@ if(len(sys.argv) == 6):
                                 '[' + string.punctuation + ']', '', word)
                             if newWord != '':
                                 if word not in words:
-                                    words[word] = counter
-                                    counter += 1
-            words_file = open('nopunctWords.txt', 'w')
-            json.dump(words, words_file)
-            print("Generation sucsessful")
+                                    # Stop words
+                                    if(sys.argv[5] == '--stopwords'):
+                                        words[word] = counter
+                                        counter += 1
+                                    elif(sys.argv[5] == '--nostopwords'):
+                                        if word not in stopwords:
+                                            words[word] = counter
+                                            counter += 1
+                                    else:
+                                        print("Invalid argument")
+                                        sys.exit(1)
+            # words_file = open('nopunctnostopWords.txt', 'w')
+            # json.dump(words, words_file)
+            # print("Generation sucsessful")
     else:
         print("Invalid argument")
         sys.exit(1)
 else:
     print("Invalid arguments")
     sys.exit(1)
-# Stop words
-if(sys.argv[5] == '--stopwords'):
-    pythonisstupid = 1
-elif(sys.argv[5] == '--nostopwords'):
-    print("g")
-else:
-    print("Invalid argument")
-    sys.exit(1)
+
 # Now make the matrix for binary or frequency
+print(len(words))
 if sys.argv[1] == "--binary":
     print('Creating matrix X for binary representation...')
     x = np.zeros((2000, len(words)), dtype=np.int)
