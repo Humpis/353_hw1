@@ -271,12 +271,30 @@ avgRecallN = 0
 avgAccuracy = 0
 avgPrecision = 0
 avgRecall = 0
-tie = 0
+totaltie = 0
+
+maxPrecisionP = 0
+maxPrecisionN = 0
+maxRecallP = 0
+maxRecallN = 0
+maxAccuracy = 0
+maxPrecision = 0
+maxRecall = 0
+
+minPrecisionP = 1
+minPrecisionN = 1
+minRecallP = 1
+minRecallN = 1
+minAccuracy = 1
+minPrecision = 1
+minRecall = 1
+
 for a in range(0, 5):
     tp = 0
     fp = 0
     tn = 0
     fn = 0
+    tie = 0
     if a == 0:
         if k == 0:
             xtrain = np.delete(xo, np.s_[0:400], axis=0)
@@ -301,7 +319,7 @@ for a in range(0, 5):
                 dpos = scipy.spatial.distance.minkowski(x1[i], posCenter, p)
                 if dneg == dpos:
                     tie += 1
-                if dneg < dpos:
+                elif dneg < dpos:
                     if y1[i] == 0:
                         tn += 1
                     else:
@@ -323,7 +341,7 @@ for a in range(0, 5):
                 positive /= k
                 if positive == .5:
                     tie += 1
-                if positive >= .5:
+                elif positive > .5:
                     if y1[i] == 1:
                         tp += 1
                     else:
@@ -357,7 +375,7 @@ for a in range(0, 5):
                 dpos = scipy.spatial.distance.minkowski(x2[i], posCenter, p)
                 if dneg == dpos:
                     tie += 1
-                if dneg < dpos:
+                elif dneg < dpos:
                     if y2[i] == 0:
                         tn += 1
                     else:
@@ -379,7 +397,7 @@ for a in range(0, 5):
                 positive /= k
                 if positive == .5:
                     tie += 1
-                if positive >= .5:
+                elif positive > .5:
                     if y2[i] == 1:
                         tp += 1
                     else:
@@ -413,7 +431,7 @@ for a in range(0, 5):
                 dpos = scipy.spatial.distance.minkowski(x3[i], posCenter, p)
                 if dneg == dpos:
                     tie += 1
-                if dneg < dpos:
+                elif dneg < dpos:
                     if y3[i] == 0:
                         tn += 1
                     else:
@@ -435,7 +453,7 @@ for a in range(0, 5):
                 positive /= k
                 if positive == .5:
                     tie += 1
-                if positive >= .5:
+                elif positive > .5:
                     if y3[i] == 1:
                         tp += 1
                     else:
@@ -469,7 +487,7 @@ for a in range(0, 5):
                 dpos = scipy.spatial.distance.minkowski(x4[i], posCenter, p)
                 if dneg == dpos:
                     tie += 1
-                if dneg < dpos:
+                elif dneg < dpos:
                     if y4[i] == 0:
                         tn += 1
                     else:
@@ -491,7 +509,7 @@ for a in range(0, 5):
                 positive /= k
                 if positive == .5:
                     tie += 1
-                if positive >= .5:
+                elif positive > .5:
                     if y4[i] == 1:
                         tp += 1
                     else:
@@ -525,7 +543,7 @@ for a in range(0, 5):
                 dpos = scipy.spatial.distance.minkowski(x5[i], posCenter, p)
                 if dneg == dpos:
                     tie += 1
-                if dneg < dpos:
+                elif dneg < dpos:
                     if y5[i] == 0:
                         tn += 1
                     else:
@@ -547,7 +565,7 @@ for a in range(0, 5):
                 positive /= k
                 if positive == .5:
                     tie += 1
-                if positive >= .5:
+                elif positive > .5:
                     if y5[i] == 1:
                         tp += 1
                     else:
@@ -586,6 +604,37 @@ for a in range(0, 5):
         avgAccuracy += accuracy
         avgPrecision += precision
         avgRecall += recall
+    if tie != 0:
+        print("    Ties       ", tie)
+    totaltie += tie
+    if maxPrecisionP < precisionP:
+        maxPrecisionP = precisionP
+    if maxPrecisionN < precisionN:
+        maxPrecisionN = precisionN
+    if maxRecallP < recallP:
+        maxRecallP = recallP
+    if maxRecallN < recallN:
+        maxRecallN = recallN
+    if maxAccuracy < accuracy:
+        maxAccuracy = accuracy
+    if maxPrecision < precision:
+        maxPrecision = precision
+    if maxRecall < recall:
+        maxRecall = recall
+    if minPrecisionP > precisionP:
+        minPrecisionP = precisionP
+    if minPrecisionN > precisionN:
+        minPrecisionN = precisionN
+    if minRecallP > recallP:
+        minRecallP = recallP
+    if minRecallN > recallN:
+        minRecallN = recallN
+    if minAccuracy > accuracy:
+        minAccuracy = accuracy
+    if minPrecision > precision:
+        minPrecision = precision
+    if minRecall > recall:
+        minRecall = recall
 print("Average performance measures")
 print("    Precision+ ", avgPrecisionP / 5)
 print("    Precision- ", avgPrecisionN / 5)
@@ -594,6 +643,22 @@ print("    Recall-    ", avgRecallN / 5)
 print("    Accuracy   ", avgAccuracy / 5)
 print("    Precision  ", avgPrecision / 5)
 print("    Recall     ", avgRecall / 5)
-if tie != 0:
-    print("Ties: ", tie)
+if totaltie != 0:
+    print("    Total Ties ", totaltie)
+print("Minimum performance measures")
+print("    Precision+ ", minPrecisionP)
+print("    Precision- ", minPrecisionN)
+print("    Recall+    ", minRecallP)
+print("    Recall-    ", minRecallN)
+print("    Accuracy   ", minAccuracy)
+print("    Precision  ", minPrecision)
+print("    Recall     ", minRecall)
+print("Maximum performance measures")
+print("    Precision+ ", maxPrecisionP)
+print("    Precision- ", maxPrecisionN)
+print("    Recall+    ", maxRecallP)
+print("    Recall-    ", maxRecallN)
+print("    Accuracy   ", maxAccuracy)
+print("    Precision  ", maxPrecision)
+print("    Recall     ", maxRecall)
 sys.exit(0)
