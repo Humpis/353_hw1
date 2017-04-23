@@ -202,14 +202,33 @@ if sys.argv[3][:4] == '--k=':
     except ValueError:
         print("Error: K must be an integer")
         sys.exit(1)
+# elif sys.argv[3] == 'nearestcentroid':
+    # print('Normalizing feature vectors...')
+    # negCenter = np.array(1000)
+    # posCenter = np.array(1000)
+    # for i in range(0, 1000):
+    #     xi = np.array(x[i])
+    #     xinorm = la.norm(xi)
+    #     xi = xi / xinorm
+    #     negCenter += xi
+    # for i in range(1000, 2000):
+    #     xi = np.array(x[i])
+    #     xinorm = la.norm(xi)
+    #     xi = xi / xinorm
+    #     posCenter += xi
+    # negCenter /= 1000
+    # posCenter /= 1000
+    # sys.exit(0)
 else:
     print("Invalid argument")
     sys.exit(1)
 
 if sys.argv[4] == '--metric=euclidean':
     metric = 'euclidean'
+    p = 2
 elif sys.argv[4] == '--metric=manhattan':
     metric = 'cityblock'
+    p = 1
 else:
     print("Invalid argument")
     sys.exit(1)
@@ -230,13 +249,17 @@ xo = x.copy()
 yo = y.copy()
 
 print("Shuffling data matrix")
-for i in range(1, 1000):
-    if i % 2 == 0:
-        continue
-    xo[i] = x[i + 999]
-    yo[i] = y[i + 999]
-    xo[i + 999] = x[i]
-    yo[i + 999] = y[i]
+# for i in range(1, 1000):
+#     if i % 2 == 0:
+#         continue
+#     xo[i] = x[i + 999]
+#     yo[i] = y[i + 999]
+#     xo[i + 999] = x[i]
+#     yo[i + 999] = y[i]
+randomfloat = np.random.rand(2000)
+randomsort = np.argsort(randomfloat)
+xo = x[randomsort]
+yo = y[randomsort]
 
 print('Normalizing feature vectors...')
 for i in range(0, 2000):
@@ -266,6 +289,7 @@ avgRecallN = 0
 avgAccuracy = 0
 avgPrecision = 0
 avgRecall = 0
+tie = 0
 for a in range(0, 5):
     tp = 0
     fp = 0
@@ -300,135 +324,320 @@ for a in range(0, 5):
     # anwer
 
     if a == 0:
-        d = scipy.spatial.distance.cdist(x1, xo, metric)
-        print(d)
-        print(len(d[0]))
-        d = np.delete(d, np.s_[0:400], axis=1)
-        yy = np.delete(yo, np.s_[0:400], axis=0)
-        # print(d)
-        # print(len(d[0]))
-        for i in range(0, 400):
-            sortedd = np.argsort(d[i])
-            # print(sortedd)
-            # print(d[i][sortedd])
-            positive = 0
-            for j in range(0, k):
-                positive += yy[sortedd[j]]
-            positive /= k
-            if positive >= .5:
-                if y1[i] == 1:
-                    tp += 1
+        if k == 0:
+            xtrain = np.delete(xo, np.s_[0:400], axis=0)
+            ytrain = np.delete(yo, np.s_[0:400])
+            negCenter = 0
+            posCenter = 0
+            negCount = 0
+            posCount = 0
+            for i in range(0, 1600):
+                if(ytrain[i] == 0):
+                    xi = np.array(xtrain[i])
+                    negCenter += xi
+                    negCount += 1
                 else:
-                    fp += 1
-            else:
-                if y1[i] == 1:
-                    fn += 1
+                    xi = np.array(xtrain[i])
+                    posCenter += xi
+                    posCount += 1
+            negCenter /= negCount
+            posCenter /= posCount
+            for i in range(0, 400):
+                dneg = scipy.spatial.distance.minkowski(x1[i], negCenter, p)
+                dpos = scipy.spatial.distance.minkowski(x1[i], posCenter, p)
+                if dneg == dpos:
+                    tie += 1
+                if dneg < dpos:
+                    if y1[i] == 0:
+                        tn += 1
+                    else:
+                        fn += 1
                 else:
-                    tn += 1
+                    if y1[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+        else:
+            d = scipy.spatial.distance.cdist(x1, xo, metric)
+            # print(d)
+            # print(len(d[0]))
+            d = np.delete(d, np.s_[0:400], axis=1)
+            yy = np.delete(yo, np.s_[0:400], axis=0)
+            # print(d)
+            # print(len(d[0]))
+            for i in range(0, 400):
+                sortedd = np.argsort(d[i])
+                # print(sortedd)
+                # print(d[i][sortedd])
+                positive = 0
+                for j in range(0, k):
+                    positive += yy[sortedd[j]]
+                positive /= k
+                if positive == .5:
+                    tie += 1
+                if positive >= .5:
+                    if y1[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+                else:
+                    if y1[i] == 1:
+                        fn += 1
+                    else:
+                        tn += 1
     if a == 1:
-        d = scipy.spatial.distance.cdist(x2, xo, metric)
-        d = np.delete(d, np.s_[400:800], axis=1)
-        yy = np.delete(yo, np.s_[400:800], axis=0)
-        for i in range(0, 400):
-            sortedd = np.argsort(d[i])
-            positive = 0
-            for j in range(0, k):
-                positive += yy[sortedd[j]]
-            positive /= k
-            if positive >= .5:
-                if y2[i] == 1:
-                    tp += 1
+        if k == 0:
+            xtrain = np.delete(xo, np.s_[400:800], axis=0)
+            ytrain = np.delete(yo, np.s_[400:800])
+            negCenter = 0
+            posCenter = 0
+            negCount = 0
+            posCount = 0
+            for i in range(0, 1600):
+                if(ytrain[i] == 0):
+                    xi = np.array(xtrain[i])
+                    negCenter += xi
+                    negCount += 1
                 else:
-                    fp += 1
-            else:
-                if y2[i] == 1:
-                    fn += 1
+                    xi = np.array(xtrain[i])
+                    posCenter += xi
+                    posCount += 1
+            negCenter /= negCount
+            posCenter /= posCount
+            for i in range(0, 400):
+                dneg = scipy.spatial.distance.minkowski(x2[i], negCenter, p)
+                dpos = scipy.spatial.distance.minkowski(x2[i], posCenter, p)
+                if dneg == dpos:
+                    tie += 1
+                if dneg < dpos:
+                    if y2[i] == 0:
+                        tn += 1
+                    else:
+                        fn += 1
                 else:
-                    tn += 1
+                    if y2[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+        else:
+            d = scipy.spatial.distance.cdist(x2, xo, metric)
+            d = np.delete(d, np.s_[400:800], axis=1)
+            yy = np.delete(yo, np.s_[400:800], axis=0)
+            for i in range(0, 400):
+                sortedd = np.argsort(d[i])
+                positive = 0
+                for j in range(0, k):
+                    positive += yy[sortedd[j]]
+                positive /= k
+                if positive == .5:
+                    tie += 1
+                if positive >= .5:
+                    if y2[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+                else:
+                    if y2[i] == 1:
+                        fn += 1
+                    else:
+                        tn += 1
     if a == 2:
-        d = scipy.spatial.distance.cdist(x3, xo, metric)
-        d = np.delete(d, np.s_[800:1200], axis=1)
-        yy = np.delete(yo, np.s_[800:1200], axis=0)
-        for i in range(0, 400):
-            sortedd = np.argsort(d[i])
-            positive = 0
-            for j in range(0, k):
-                positive += yy[sortedd[j]]
-            positive /= k
-            if positive >= .5:
-                if y3[i] == 1:
-                    tp += 1
+        if k == 0:
+            xtrain = np.delete(xo, np.s_[800:1200], axis=0)
+            ytrain = np.delete(yo, np.s_[800:1200])
+            negCenter = 0
+            posCenter = 0
+            negCount = 0
+            posCount = 0
+            for i in range(0, 1600):
+                if(ytrain[i] == 0):
+                    xi = np.array(xtrain[i])
+                    negCenter += xi
+                    negCount += 1
                 else:
-                    fp += 1
-            else:
-                if y3[i] == 1:
-                    fn += 1
+                    xi = np.array(xtrain[i])
+                    posCenter += xi
+                    posCount += 1
+            negCenter /= negCount
+            posCenter /= posCount
+            for i in range(0, 400):
+                dneg = scipy.spatial.distance.minkowski(x3[i], negCenter, p)
+                dpos = scipy.spatial.distance.minkowski(x3[i], posCenter, p)
+                if dneg == dpos:
+                    tie += 1
+                if dneg < dpos:
+                    if y3[i] == 0:
+                        tn += 1
+                    else:
+                        fn += 1
                 else:
-                    tn += 1
+                    if y3[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+        else:
+            d = scipy.spatial.distance.cdist(x3, xo, metric)
+            d = np.delete(d, np.s_[800:1200], axis=1)
+            yy = np.delete(yo, np.s_[800:1200], axis=0)
+            for i in range(0, 400):
+                sortedd = np.argsort(d[i])
+                positive = 0
+                for j in range(0, k):
+                    positive += yy[sortedd[j]]
+                positive /= k
+                if positive == .5:
+                    tie += 1
+                if positive >= .5:
+                    if y3[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+                else:
+                    if y3[i] == 1:
+                        fn += 1
+                    else:
+                        tn += 1
     if a == 3:
-        d = scipy.spatial.distance.cdist(x4, xo, metric)
-        d = np.delete(d, np.s_[1200:1600], axis=1)
-        yy = np.delete(yo, np.s_[1200:1600], axis=0)
-        for i in range(0, 400):
-            sortedd = np.argsort(d[i])
-            positive = 0
-            for j in range(0, k):
-                positive += yy[sortedd[j]]
-            positive /= k
-            if positive >= .5:
-                if y4[i] == 1:
-                    tp += 1
+        if k == 0:
+            xtrain = np.delete(xo, np.s_[1200:1600], axis=0)
+            ytrain = np.delete(yo, np.s_[1200:1600])
+            negCenter = 0
+            posCenter = 0
+            negCount = 0
+            posCount = 0
+            for i in range(0, 1600):
+                if(ytrain[i] == 0):
+                    xi = np.array(xtrain[i])
+                    negCenter += xi
+                    negCount += 1
                 else:
-                    fp += 1
-            else:
-                if y4[i] == 1:
-                    fn += 1
+                    xi = np.array(xtrain[i])
+                    posCenter += xi
+                    posCount += 1
+            negCenter /= negCount
+            posCenter /= posCount
+            for i in range(0, 400):
+                dneg = scipy.spatial.distance.minkowski(x4[i], negCenter, p)
+                dpos = scipy.spatial.distance.minkowski(x4[i], posCenter, p)
+                if dneg == dpos:
+                    tie += 1
+                if dneg < dpos:
+                    if y4[i] == 0:
+                        tn += 1
+                    else:
+                        fn += 1
                 else:
-                    tn += 1
+                    if y4[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+        else:
+            d = scipy.spatial.distance.cdist(x4, xo, metric)
+            d = np.delete(d, np.s_[1200:1600], axis=1)
+            yy = np.delete(yo, np.s_[1200:1600], axis=0)
+            for i in range(0, 400):
+                sortedd = np.argsort(d[i])
+                positive = 0
+                for j in range(0, k):
+                    positive += yy[sortedd[j]]
+                positive /= k
+                if positive == .5:
+                    tie += 1
+                if positive >= .5:
+                    if y4[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+                else:
+                    if y4[i] == 1:
+                        fn += 1
+                    else:
+                        tn += 1
     if a == 4:
-        d = scipy.spatial.distance.cdist(x5, xo, metric)
-        d = np.delete(d, np.s_[1600:2000], axis=1)
-        yy = np.delete(yo, np.s_[1600:2000], axis=0)
-        for i in range(0, 400):
-            sortedd = np.argsort(d[i])
-            positive = 0
-            for j in range(0, k):
-                positive += yy[sortedd[j]]
-            positive /= k
-            if positive >= .5:
-                if y5[i] == 1:
-                    tp += 1
+        if k == 0:
+            xtrain = np.delete(xo, np.s_[1600:2000], axis=0)
+            ytrain = np.delete(yo, np.s_[1600:2000])
+            negCenter = 0
+            posCenter = 0
+            negCount = 0
+            posCount = 0
+            for i in range(0, 1600):
+                if(ytrain[i] == 0):
+                    xi = np.array(xtrain[i])
+                    negCenter += xi
+                    negCount += 1
                 else:
-                    fp += 1
-            else:
-                if y5[i] == 1:
-                    fn += 1
+                    xi = np.array(xtrain[i])
+                    posCenter += xi
+                    posCount += 1
+            negCenter /= negCount
+            posCenter /= posCount
+            for i in range(0, 400):
+                dneg = scipy.spatial.distance.minkowski(x5[i], negCenter, p)
+                dpos = scipy.spatial.distance.minkowski(x5[i], posCenter, p)
+                if dneg == dpos:
+                    tie += 1
+                if dneg < dpos:
+                    if y5[i] == 0:
+                        tn += 1
+                    else:
+                        fn += 1
                 else:
-                    tn += 1
-
-    precisionP = tp / (tp + fp)
-    precisionN = tn / (tn + fn)
-    recallP = tp / (tp + fn)
-    recallN = tn / (tn + fp)
-    accuracy = (tp + tn) / (tp + tn + fp + fn)
-    precision = (precisionP + precisionN) / 2
-    recall = (recallP + recallN) / 2
+                    if y5[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+        else:
+            d = scipy.spatial.distance.cdist(x5, xo, metric)
+            d = np.delete(d, np.s_[1600:2000], axis=1)
+            yy = np.delete(yo, np.s_[1600:2000], axis=0)
+            for i in range(0, 400):
+                sortedd = np.argsort(d[i])
+                positive = 0
+                for j in range(0, k):
+                    positive += yy[sortedd[j]]
+                positive /= k
+                if positive == .5:
+                    tie += 1
+                if positive >= .5:
+                    if y5[i] == 1:
+                        tp += 1
+                    else:
+                        fp += 1
+                else:
+                    if y5[i] == 1:
+                        fn += 1
+                    else:
+                        tn += 1
     print("Fold: ", a + 1)
-    print("    Precision+ ", precisionP)
-    print("    Precision- ", precisionN)
-    print("    Recall+    ", recallP)
-    print("    Recall-    ", recallN)
-    print("    Accuracy   ", accuracy)
-    print("    Precision  ", precision)
-    print("    Recall     ", recall)
-    avgPrecisionP += precisionP
-    avgPrecisionN += precisionN
-    avgRecallP += recallP
-    avgRecallN += recallN
-    avgAccuracy += accuracy
-    avgPrecision += precision
-    avgRecall += recall
-    print(tp, fp, tn, fn)
+    print("TP:", tp, "FP:", fp, "TN:", tn, "FN:", fn)
+    if tp + fp == 0 or tn + fn == 0 or tp + fn == 0 or tn + fp == 0:
+        print("Divide by 0 error. Only computing accuracy")
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        print("    Accuracy   ", accuracy)
+        avgAccuracy += accuracy
+    else:
+        precisionP = tp / (tp + fp)
+        precisionN = tn / (tn + fn)
+        recallP = tp / (tp + fn)
+        recallN = tn / (tn + fp)
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        precision = (precisionP + precisionN) / 2
+        recall = (recallP + recallN) / 2
+        print("    Precision+ ", precisionP)
+        print("    Precision- ", precisionN)
+        print("    Recall+    ", recallP)
+        print("    Recall-    ", recallN)
+        print("    Accuracy   ", accuracy)
+        print("    Precision  ", precision)
+        print("    Recall     ", recall)
+        avgPrecisionP += precisionP
+        avgPrecisionN += precisionN
+        avgRecallP += recallP
+        avgRecallN += recallN
+        avgAccuracy += accuracy
+        avgPrecision += precision
+        avgRecall += recall
 print("Average performance measures")
 print("    Precision+ ", avgPrecisionP / 5)
 print("    Precision- ", avgPrecisionN / 5)
@@ -437,4 +646,6 @@ print("    Recall-    ", avgRecallN / 5)
 print("    Accuracy   ", avgAccuracy / 5)
 print("    Precision  ", avgPrecision / 5)
 print("    Recall     ", avgRecall / 5)
+if tie != 0:
+    print("Ties: ", tie)
 sys.exit(0)
