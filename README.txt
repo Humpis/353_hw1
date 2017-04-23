@@ -9,13 +9,13 @@ DESCRIPTION
     
     Options:
         --binary            use binary representation of feature vectors	
-        --frequency         use frequency represenation of feature vecotrs
+        --frequency         use frequency representation of feature vectors
         --punct             count punctuation as features
-        --nopunct           do not count puncation as features
+        --nopunct           do not count punctuation as features
         --k=NUM             NUM is the number of nearest neighbors to check
         --k=0               Performs Nearest-Centroid Classification instead of K-Nearest-Neighbor
         --metric=euclidean  use euclidean distance to compute nearest neighbors
-        --metric=manhattan  use manhattan distance to compute nearest niehgbors
+        --metric=manhattan  use manhattan distance to compute nearest neighbors
         --stopwords         count stops words as features
         --nostopwords       ignore stop words as features
     
@@ -25,6 +25,7 @@ DESCRIPTION
 KNOWN BUGS
     manhattan/binary combination with Nearest-Centroid classifies everything as negative
     manhattan/frequency/nostopwords/nopunct combination with Nearest-Centroid classifies almost everything as negative
+    manhattan/binary combination with K-NN classifies almost everything as negative
     manhattan distance in general doesn't classify things well, tending to think everything is negative
 
 IMPLEMENTATION
