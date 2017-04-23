@@ -154,7 +154,6 @@ else:
     sys.exit(1)
 
 # Now make the matrix for binary or frequency
-# print(len(words))
 if sys.argv[1] == "--binary":
     print('Creating matrix X for binary representation...')
     x = np.zeros((2000, len(words)), dtype=np.float)
@@ -202,23 +201,6 @@ if sys.argv[3][:4] == '--k=':
     except ValueError:
         print("Error: K must be an integer")
         sys.exit(1)
-# elif sys.argv[3] == 'nearestcentroid':
-    # print('Normalizing feature vectors...')
-    # negCenter = np.array(1000)
-    # posCenter = np.array(1000)
-    # for i in range(0, 1000):
-    #     xi = np.array(x[i])
-    #     xinorm = la.norm(xi)
-    #     xi = xi / xinorm
-    #     negCenter += xi
-    # for i in range(1000, 2000):
-    #     xi = np.array(x[i])
-    #     xinorm = la.norm(xi)
-    #     xi = xi / xinorm
-    #     posCenter += xi
-    # negCenter /= 1000
-    # posCenter /= 1000
-    # sys.exit(0)
 else:
     print("Invalid argument")
     sys.exit(1)
@@ -295,34 +277,6 @@ for a in range(0, 5):
     fp = 0
     tn = 0
     fn = 0
-    # for i in range(a * 400, a * 400 + 400):
-    #     d = np.zeros((2000), dtype=np.float)
-    #     for j in range(0, 2000):
-    #         if (j >= a * 400) and (j < a * 400 + 400):
-    #             continue
-    #         xi = np.array(xo[i])
-    #         xj = np.array(xo[j])
-    #         # d[j] = la.norm(xi - xj)
-    #         d[j] = scipy.spatial.distance.minkowski(xi, xj, metric)
-    #     sortedd = np.argsort(d)
-    #     positive = 0
-    #     for j in range(0, k):
-    #         positive += yo[sortedd[j + 400]]
-    #     positive /= k
-    #     if positive >= .5:
-    #         if yo[i] == 1:
-    #             tp += 1
-    #         else:
-    #             fp += 1
-    #     else:
-    #         if yo[i] == 1:
-    #             fn += 1
-    #         else:
-    #             tn += 1
-    # this is only good for the first fold. im retartded. but it
-    # also happens to be identical so whatever, it technically gives the right
-    # anwer
-
     if a == 0:
         if k == 0:
             xtrain = np.delete(xo, np.s_[0:400], axis=0)
@@ -359,16 +313,10 @@ for a in range(0, 5):
                         fp += 1
         else:
             d = scipy.spatial.distance.cdist(x1, xo, metric)
-            # print(d)
-            # print(len(d[0]))
             d = np.delete(d, np.s_[0:400], axis=1)
             yy = np.delete(yo, np.s_[0:400], axis=0)
-            # print(d)
-            # print(len(d[0]))
             for i in range(0, 400):
                 sortedd = np.argsort(d[i])
-                # print(sortedd)
-                # print(d[i][sortedd])
                 positive = 0
                 for j in range(0, k):
                     positive += yy[sortedd[j]]
